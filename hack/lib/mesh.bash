@@ -72,6 +72,10 @@ function deploy_servicemeshcontrolplane {
 
   # creating smcp often fails due to webhook error
   timeout 120 "[[ \$(oc apply -f ${resources_dir}/smcp.yaml | oc get smcp -n istio-system basic --no-headers | wc -l) != 1 ]]" || return 1
+  if [[ ${ROSA:-} == "true" ]]; then
+    logger.info "ThirdParty tokens required when using ROSA cluster"
+    oc patch smcp -n istio-system basic --type='merge' --patch-file ${resources_dir}/smcp-rosa-patch.yaml  || return $?
+  fi
   oc wait --timeout=180s --for=condition=Ready smcp -n istio-system basic || oc get smcp -n istio-system basic -o yaml
 }
 
