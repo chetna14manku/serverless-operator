@@ -1,4 +1,0 @@
-spec:
-  security:
-    identity:
-      type: ThirdParty
